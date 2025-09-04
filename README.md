@@ -7,11 +7,34 @@ The goal is to use VLMs to improve CBMs, trained and tested on a syntetic datase
 ## Project Structure
 
 ```
-datasets.py     # Dataset loading and balancing utilities
-llava.py        # LLaVA feedback and annotation logic
-model.py        # Model architectures (CBM, predictors)
-main.py         # Main training, evaluation, and pipeline script
-readme.md       # This file
+Improving-CBM-with-VLMs
+├── cub
+│   ├── cub_enhanced_llava_feedback_adjust.json
+│   ├── cub_training_history.json
+│   └── results.out
+├── shapes3d
+│   ├── results.out
+│   ├── shapes3d_enhanced_llava_feedback_adjust.json
+│   ├── shapes3d_training_history.json
+│   ├── test_split_cl_clean.npy
+│   ├── test_split_cl.npy
+│   ├── test_split_imgs_clean.npy
+│   ├── test_split_imgs.npy
+│   ├── train_split_cl_clean.npy
+│   ├── train_split_cl.npy
+│   ├── train_split_imgs_clean.npy
+│   ├── train_split_imgs.npy
+│   ├── val_split_cl_clean.npy
+│   ├── val_split_cl.npy
+│   ├── val_split_imgs_clean.npy
+│   └── val_split_imgs.npy
+│ 
+├── datasets.py     # Dataset loading and balancing utilities
+├── llava.py        # LLaVA feedback and annotation logic
+├── model.py        # Model architectures (CBM, predictors)
+├── main.py         # Main training, evaluation, and pipeline script
+└── readme.md       # This file
+
 ```
 
 
