@@ -1,0 +1,84 @@
+Using device: cuda
+==================================================
+TRAINING ON SHAPES3D DATASET
+==================================================
+Val F1-macro: 0.353 | F1-pos: 0.707
+Val F1-macro: 0.353 | F1-pos: 0.707
+Val F1-macro: 0.353 | F1-pos: 0.707
+Val F1-macro: 0.353 | F1-pos: 0.707
+Val F1-macro: 0.353 | F1-pos: 0.707
+Val F1-macro: 0.353 | F1-pos: 0.707
+Val F1-macro: 0.353 | F1-pos: 0.707
+Val F1-macro: 0.353 | F1-pos: 0.707
+Val F1-macro: 0.353 | F1-pos: 0.707
+Val F1-macro: 0.712 | F1-pos: 0.812
+Val F1-macro: 0.758 | F1-pos: 0.780
+Val F1-macro: 0.756 | F1-pos: 0.807
+Val F1-macro: 0.776 | F1-pos: 0.805
+Val F1-macro: 0.837 | F1-pos: 0.859
+Val F1-macro: 0.844 | F1-pos: 0.865
+Final model saved as 'final_model.pth'
+
+ TRAINING SUMMARY:
+   Completed epochs: 15
+   Best epoch: 14
+   Best val loss: 1.0847
+   Best val accuracy: 84.67%
+   Best concept accuracy: 91.33%
+   Best f1: 0.87%
+Training complete! Best model saved as 'best_model.pth'
+shapes3d model setup complete!
+
+Evaluating on test set BEFORE finetuning...
+=== Test Evaluation Results ===
+Test Accuracy: 0.8500
+Test Concept Accuracy: 0.1429
+Total Samples: 100
+-------------
+Test F1-macro: 0.8482
+Test F1-weighted: 0.8482
+Test F1 - class 1: 0.8649
+Test F1 - class 0: 0.8315
+Confusion Matrix:
+[[37 13]
+ [ 2 48]]
+
+=== ENHANCED LLAVA FEEDBACK STATISTICS (SHAPES3D) ===
+Total samples evaluated: 150
+Corrections suggested: 18 (12.0%)
+High-confidence corrections: 18 (12.0%)
+
+Strategy Agreement with CBM:
+  direct: 82.0% agreement (123/150)
+  guided: 81.3% agreement (122/150)
+  complete: 40.7% agreement (61/150)
+
+LLaVA Confidence Distribution:
+  Mean: 0.831
+  Std: 0.133
+  High confidence (>0.5): 150 samples
+  Low confidence (<0.4): 0 samples
+
+ FINE-TUNING SUMMARY:
+   Completed epochs: 8
+   Best epoch: 2
+   Best val loss: 1.0587
+   Best val accuracy: 85.33%
+   Best concept accuracy: 91.38%
+   Best F1: 0.8764
+   Corrections applied: 18
+
+Evaluating on test set AFTER finetuning...
+=== Test Evaluation Results ===
+Test Accuracy: 0.8800
+Test Concept Accuracy: 0.1429
+Total Samples: 100
+-------------
+Test F1-macro: 0.8788
+Test F1-weighted: 0.8788
+Test F1 - class 1: 0.8667
+Test F1 - class 0: 0.8909
+Confusion Matrix:
+[[49  1]
+ [11 39]]
+Finish
