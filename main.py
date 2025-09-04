@@ -874,7 +874,7 @@ def main(args):
     print(f"Using device: {device}")
     if selected_dataset == 'shapes3d':
         concept_names=SHAPES3D_CONCEPT_NAMES
-        output_dir = args.data_dir + '_shapes3d'
+        output_dir = args.data_dir + '_shapes3d' if 'shapes3d' not in args.data_dir else args.data_dir
         epoch = args.epochs_3d
         epochs_finetuning = 10
         patience = args.patience_3d
@@ -946,7 +946,7 @@ def main(args):
 
     if selected_dataset == 'cub':
         concept_names=CUB_CONCEPT_NAMES
-        output_dir = args.data_dir + '_cub'
+        output_dir = args.data_dir + '_cub' if 'cub' not in args.data_dir else args.data_dir
         epoch = args.epochs_cub
         epochs_finetuning = epoch
         patience = args.patience_cub
@@ -1089,7 +1089,7 @@ if __name__ == "__main__":
                         help='Dataset to use for the experiment')
     parser.add_argument('--data_dir', type=str, required=True,
                        help='Path to the directory')
-    parser.add_argument('--epochs_3d', type=int, default=70,
+    parser.add_argument('--epochs_3d', type=int, default=15,
                        help='Number of training epochs for 3D')
     parser.add_argument('--epochs_cub', type=int, default=30,
                        help='Number of training epochs for CUB')
@@ -1097,17 +1097,17 @@ if __name__ == "__main__":
                        help='Patience for early stopping with shapes')
     parser.add_argument('--patience_cub', type=int, default=15,
                        help='Patience for early stopping with cub')
-    parser.add_argument('--batch_size_3d', type=int, default=64,
+    parser.add_argument('--batch_size_3d', type=int, default=16,
                        help='Batch size for 3D training')
     parser.add_argument('--batch_size_cub', type=int, default=32,
                        help='Batch size for CUB training')
-    parser.add_argument('--train_samples_3d', type=int, default=100,
+    parser.add_argument('--train_samples_3d', type=int, default=150,
                        help='Samples to use for training set')
-    parser.add_argument('--val_samples_3d', type=int, default=70,
+    parser.add_argument('--val_samples_3d', type=int, default=150,
                        help='Samples to use for validation set')
     parser.add_argument('--test_samples_3d', type=int, default=100,
                        help='Samples to use for testing set')
-    parser.add_argument('--min_confidence', type=float, default=0.6,
+    parser.add_argument('--min_confidence', type=float, default=0.5,
                        help='Minimum confidence for feedback collection')
     args = parser.parse_args()
     main(args)
