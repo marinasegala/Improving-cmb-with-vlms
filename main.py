@@ -466,7 +466,7 @@ def create_mixed_finetune_loader(feedback_dataset, original_train_dataset, batch
 
 
     def mixed_batch_generator():
-        # First yield all feedback samples (with batch size = feedback_size)
+        # all feedback samples
         feedback_indices = list(range(len(feedback_dataset)))
         for i in range(0, len(feedback_indices), feedback_size):
             batch_idxs = feedback_indices[i:i+feedback_size]
@@ -477,7 +477,7 @@ def create_mixed_finetune_loader(feedback_dataset, original_train_dataset, batch
             confidence = torch.stack([b['confidence'] for b in batch])
             yield {'image': images, 'label': labels, 'concepts': concepts, 'confidence': confidence}
 
-        # Then yield original samples not present in feedback (with batch size = original_size)
+        # original samples not present in feedback
         for i in range(0, len(only_original_indices), original_size):
             batch_idxs = only_original_indices[i:i+original_size]
             batch = [original_train_dataset[j] for j in batch_idxs]
