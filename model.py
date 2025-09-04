@@ -5,7 +5,7 @@ import torch.nn as nn
 # ================================
 
 class ConceptPredictor(nn.Module):
-    def __init__(self, num_concepts=6, use_fc=False, input_channels=3):
+    def __init__(self, num_concepts=6, input_channels=3):
         """
         The ConceptPredictor takes an image (X) as input and predicts the concepts (C).
         Args:
@@ -69,6 +69,9 @@ class LabelPredictor(nn.Module):
         return self.net(c)
 
 class End2EndModel(nn.Module):
+    """
+    End-to-end model that combines concept and label predictors.
+    """
     def __init__(self, concept_predictor, label_predictor):
         super().__init__()
         self.concept_predictor = concept_predictor
