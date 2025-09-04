@@ -11,7 +11,7 @@ import itertools
 import json
 from tqdm import tqdm
 import argparse
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, classification_report, confusion_matrix
 import logging
 from typing import List, Dict, Optional
 from transformers import BitsAndBytesConfig
@@ -796,26 +796,8 @@ def evaluate_finetuned_model(cbm_model, test_loader, output_dir, device: str = '
     with torch.no_grad():
         for idx, (images, concepts, labels) in enumerate(tqdm(test_loader, desc="Evaluating")):
             images, concepts, labels = images.to(device), concepts.to(device), labels.to(device)
-            if 'shapes' in output_dir:
-                test_images_dir = os.path.join(output_dir, 'test_images_inspect')
-                os.makedirs(test_images_dir, exist_ok=True)
-                label_counts = {0: 0, 1: 0}
-                for i in range(images.shape[0]):
-                    img_tensor = images[i].cpu()
-                    img_to_save = (img_tensor * 0.5) + 0.5  # Undo normalization
-                    img_to_save = torch.clamp(img_to_save, 0, 1)
-                    img_array = (img_to_save.permute(1, 2, 0).numpy() * 255).astype(np.uint8)
-                    img = Image.fromarray(img_array)
-                    label = int(labels[i].cpu().item())
-                    save_path = os.path.join(test_images_dir, f'image_{idx:04d}_{i:03d}_label_{label}.png')
-                    img.save(save_path)
-                    label_counts[label] += 1
-                print(f"Saved {len(test_loader)} test images to {test_images_dir}")
-                print(f"Test label distribution: {label_counts}")
             
             pred_concepts, pred_labels = cbm_model(images)
-            
-
             pred_concepts, pred_labels = cbm_model(images)
             
             # Label accuracy
@@ -833,17 +815,13 @@ def evaluate_finetuned_model(cbm_model, test_loader, output_dir, device: str = '
     
     # Calculate metrics
     accuracy = correct / total
-    concept_accuracy = concept_correct / concept_total
     
     # Calculate per-class metrics if binary classification
-    from sklearn.metrics import classification_report, confusion_matrix
-    
     report = classification_report(all_labels, all_predictions, output_dict=True)
     cm = confusion_matrix(all_labels, all_predictions)
     
     results = {
         'test_accuracy': accuracy,
-        'test_concept_accuracy': concept_accuracy,
         'total_samples': total,
         'correct_predictions': correct,
         'classification_report': report,
@@ -852,7 +830,6 @@ def evaluate_finetuned_model(cbm_model, test_loader, output_dir, device: str = '
     
     print("=== Test Evaluation Results ===")
     print(f"Test Accuracy: {accuracy:.4f}")
-    print(f"Test Concept Accuracy: {concept_accuracy:.4f}")
     print(f"Total Samples: {total}")
     print(f"-------------")
     print(f"Test F1-macro: {report['macro avg']['f1-score']:.4f}")
