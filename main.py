@@ -44,11 +44,24 @@ def train_concept_bottleneck_model(model, train_loader, val_loader, data_dir,
                                    concept_weight=1.0, label_weight=1.0, device='cuda', patience=10):
     """
     Train the concept bottleneck model
+    Args:
+        model: The model to train
+        train_loader: DataLoader for the training set
+        val_loader: DataLoader for the validation set
+        data_dir: Directory for saving
+        learning_rate: Learning rate for the optimizer
+        weight_decay: Weight decay for the optimizer
+        num_epochs: Number of epochs to train
+        concept_weight: Weight for the concept loss
+        label_weight: Weight for the label loss
+        device: Device to train on (e.g., 'cuda' or 'cpu')
+        patience: Patience for early stopping
     """
+
     model.to(device)
 
     # Loss functions
-    concept_criterion = nn.BCELoss()  # For concept prediction
+    concept_criterion = nn.BCELoss() 
     # Compute class weights for CrossEntropyLoss
     label_counts = torch.zeros(2)
     for _, _, labels in train_loader:
@@ -57,7 +70,7 @@ def train_concept_bottleneck_model(model, train_loader, val_loader, data_dir,
     class_weights = (1.0 / (label_counts + 1e-6))
     class_weights = class_weights / class_weights.sum() * 2  # Normalize to sum to num_classes
     class_weights = class_weights.to(torch.float32).to(device)
-    label_criterion = nn.CrossEntropyLoss(weight=class_weights)  # For label prediction
+    label_criterion = nn.CrossEntropyLoss(weight=class_weights) 
 
 
     # Optimizer
@@ -143,7 +156,6 @@ def train_concept_bottleneck_model(model, train_loader, val_loader, data_dir,
                     img_tensor = torch.clamp(img_tensor, 0, 1)
                     img_array = (img_tensor.permute(1, 2, 0).numpy() * 255).astype(np.uint8)
                     img = Image.fromarray(img_array)
-#                    img.save(os.path.join(images_dir, f'image_{index:05d}.png'))
                     img.save(os.path.join(images_dir, f'image_{image_save_counter:05d}.png'))
                     image_save_counter += 1
                 if concepts.dtype != torch.float32:
@@ -163,11 +175,9 @@ def train_concept_bottleneck_model(model, train_loader, val_loader, data_dir,
                 total_samples += labels.size(0)
                 correct_labels += (predicted_labels == labels).sum().item()
 
-                # Per F1-score
                 all_true_labels.extend(labels.cpu().numpy().tolist())
                 all_pred_labels.extend(predicted_labels.cpu().numpy().tolist())
-
-                # Concept accuracy
+                
                 predicted_concepts = (pred_concepts > 0.5).float()
                 concept_matches = (predicted_concepts == concepts).float()
                 correct_concepts += concept_matches.sum().item()
@@ -201,7 +211,7 @@ def train_concept_bottleneck_model(model, train_loader, val_loader, data_dir,
         val_accuracies.append(val_accuracy)
         concept_accuracies.append(concept_accuracy)
 
-        #early stopping (ora su F1-score)
+        # early stopping 
         if f1_pos > best_f1:
             best_f1 = f1_pos
             best_accuracy = val_accuracy
@@ -271,7 +281,25 @@ def enhanced_feedback_collection(logger, output_dir, cbm_model, dataloader,
                                model_path: Optional[str] = None,
                                min_confidence: float = 0.5,
                                use_uncertainty_sampling: bool = True) -> List[Dict]:
-    """Enhanced feedback collection with multiple strategies"""
+    """
+    Enhanced feedback collection with multiple strategies
+    
+    Args:
+        logger: Logger for logging information
+        output_dir: Directory to save output files
+        cbm_model: The CBM model to use for predictions
+        dataloader: DataLoader for the input data
+        llava_annotator: The LLaVA annotator for feedback collection
+        dataset_type: Type of the dataset (e.g., "shapes3d" or "cub")
+        device: Device to run the model on (e.g., "cuda" or "cpu")
+        concept_names: List of concept names for the task
+        model_path: Optional path to a pre-trained model
+        min_confidence: Minimum confidence threshold for predictions
+        use_uncertainty_sampling: Whether to use uncertainty sampling
+
+    Returns:
+        List of feedback data collected from the LLaVA annotator
+    """
     
     if model_path:
         logger.info(f"Loading CBM model from: {model_path}")
@@ -284,7 +312,7 @@ def enhanced_feedback_collection(logger, output_dir, cbm_model, dataloader,
     cbm_model.to(device)
     cbm_model.eval()
     
-    # First pass: collect all CBM predictions
+    # collect all CBM predictions
     all_predictions = {}
     feedback_image_counter = 0  # Global counter for feedback images
     with torch.no_grad():
@@ -295,7 +323,7 @@ def enhanced_feedback_collection(logger, output_dir, cbm_model, dataloader,
             pred_concepts, pred_labels = cbm_model(images)
             
             for i in range(images.shape[0]):
-                sample_id =f'{feedback_image_counter:05d}' # f'{batch_idx*images.shape[0] + i:05d}'
+                sample_id =f'{feedback_image_counter:05d}'
                 all_predictions[sample_id] = {
                     'image': images[i],
                     'pred_concepts': pred_concepts[i].cpu().numpy(),
@@ -306,8 +334,6 @@ def enhanced_feedback_collection(logger, output_dir, cbm_model, dataloader,
                     'true_labels': labels[i].item()
                 }
                 feedback_image_counter += 1
-    
-    # Uncertainty-based sampling if requested
     if use_uncertainty_sampling:
         uncertain_samples = llava_annotator.uncertainty_based_sampling(
             all_predictions, uncertainty_threshold=0.3, max_samples=300
@@ -315,7 +341,7 @@ def enhanced_feedback_collection(logger, output_dir, cbm_model, dataloader,
         ids_to_evaluate = [s['sample_id'] for s in uncertain_samples]
         logger.info(f"Selected {len(ids_to_evaluate)} uncertain samples for detailed LLaVA evaluation")
     else:
-        ids_to_evaluate = list(all_predictions.keys())[:500]  # First 500
+        ids_to_evaluate = list(all_predictions.keys())[:500] 
     
     # Enhanced feedback collection
     feedback_data = []
@@ -324,13 +350,13 @@ def enhanced_feedback_collection(logger, output_dir, cbm_model, dataloader,
         
         # Convert tensor image to PIL
         image_tensor = sample['image']
-        if image_tensor.shape[0] == 3:  # CHW format
+        if image_tensor.shape[0] == 3:  # CHW
             image_tensor = image_tensor.permute(1, 2, 0)  # HWC
         
         # Denormalize based on dataset
         if dataset_type.lower() == "shapes3d":
             image_tensor = (image_tensor * 0.5) + 0.5  # From [-1,1] to [0,1]
-        else:  # CUB - ImageNet normalization
+        else: 
             mean = torch.tensor([0.485, 0.456, 0.406])
             std = torch.tensor([0.229, 0.224, 0.225])
             mean = mean.to(image_tensor.device)
@@ -340,7 +366,6 @@ def enhanced_feedback_collection(logger, output_dir, cbm_model, dataloader,
         image_tensor = torch.clamp(image_tensor, 0, 1)
         image_pil = Image.fromarray((image_tensor.cpu() * 255).byte().numpy())
         
-        # Get enhanced feedback
         enhanced_feedback = llava_annotator.multi_prompt_evaluation(
             image_pil, sample['pred_labels'], sample['concept_probs'],
             concept_names, dataset_type, sample['true_labels']
@@ -367,7 +392,7 @@ def enhanced_feedback_collection(logger, output_dir, cbm_model, dataloader,
         }
         
         # Save image
-#        image_pil.save(comprehensive_feedback['image_path'])
+        # image_pil.save(comprehensive_feedback['image_path'])
         feedback_data.append(comprehensive_feedback)
     
     # Save comprehensive feedback
@@ -377,13 +402,21 @@ def enhanced_feedback_collection(logger, output_dir, cbm_model, dataloader,
     
     logger.info(f"Saved {len(feedback_data)} enhanced feedback samples to {feedback_file}")
     
-    # Print detailed statistics
+    # Print statistics
     print_enhanced_feedback_statistics(feedback_data, dataset_type, min_confidence)
     
     return feedback_data
 
 def print_enhanced_feedback_statistics(feedback_data: List[Dict], dataset_type: str, min_confidence: float):
-    """Print comprehensive statistics about LLaVA feedback"""
+    """
+    Print comprehensive statistics about LLaVA feedback
+    
+    Args:
+        feedback_data: List of feedback data samples
+        dataset_type: Type of the dataset (e.g., "shapes3d" or "cub")
+        min_confidence: Minimum confidence threshold for filtering samples
+    """
+    
     print(f"\n=== ENHANCED LLAVA FEEDBACK STATISTICS ({dataset_type.upper()}) ===")
     
     total_samples = len(feedback_data)
@@ -441,7 +474,14 @@ def print_enhanced_feedback_statistics(feedback_data: List[Dict], dataset_type: 
 def create_mixed_finetune_loader(feedback_dataset, original_train_dataset, batch_size=16, feedback_ratio=0.5):
     """
     Create a DataLoader that mixes feedback and original training data for fine-tuning.
-    feedback_ratio: fraction of each batch from feedback data (e.g., 0.5 means half feedback, half original)
+    Args:
+        feedback_dataset: Dataset containing feedback samples
+        original_train_dataset: Dataset containing original training samples
+        batch_size: Total batch size for fine-tuning
+        feedback_ratio: fraction of each batch from feedback data (e.g., 0.5 means half feedback, half original)
+
+    Returns:
+        A mixed DataLoader for fine-tuning
     """
     feedback_size = int(batch_size * feedback_ratio)
     original_size = batch_size - feedback_size
@@ -498,19 +538,24 @@ def finetune_cbm_with_llava_feedback(output_dir, logger, cbm_model, feedback_dat
     Fine-tune CBM model using LLaVA feedback
     
     Args:
+        output_dir: Directory to save output files
+        logger: Logger for logging information
         cbm_model: Pre-trained CBM model
         feedback_data: LLaVA feedback annotations
         original_train_loader: Original training data loader
+        val_loader: Validation data loader
         num_epochs: Number of fine-tuning epochs
         learning_rate: Learning rate for fine-tuning
+        weight_decay: Weight decay for optimizer
         device: Device for training
         concept_weight: Weight for concept loss (aligned with original training)
         label_weight: Weight for label loss (aligned with original training)
         min_confidence: Minimum confidence threshold for using feedback
         patience: Patience for early stopping
-        
+        selected_dataset: Name of the selected dataset
+
     Returns:
-        Training history dictionary
+        Dictionary with fine-tuning results 
     """
     cbm_model.to(device)
     
@@ -534,7 +579,7 @@ def finetune_cbm_with_llava_feedback(output_dir, logger, cbm_model, feedback_dat
 
     # Setup for fine-tuning
     concept_criterion = nn.BCELoss() 
-#    label_criterion = nn.CrossEntropyLoss()
+                                       
     label_counts = torch.zeros(2)
     for _, _, labels in original_train_loader:
         for l in labels:
@@ -553,11 +598,10 @@ def finetune_cbm_with_llava_feedback(output_dir, logger, cbm_model, feedback_dat
     
     optimizer = optim.Adam(cbm_model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     if 'cub' in selected_dataset:
-        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)  # Match original
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
     else:
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True)
     
-    # Training history
     train_losses = []
     val_losses = []
     val_accuracies = []
@@ -595,7 +639,6 @@ def finetune_cbm_with_llava_feedback(output_dir, logger, cbm_model, feedback_dat
             concept_loss = concept_criterion(pred_concepts, true_concepts)
             label_loss = label_criterion(pred_labels, corrected_labels)
             
-            # Apply confidence weighting to the total loss
             total_loss = concept_weight * concept_loss + label_weight * label_loss
             weighted_total_loss = total_loss * confidence_weights.mean() 
             
@@ -652,11 +695,9 @@ def finetune_cbm_with_llava_feedback(output_dir, logger, cbm_model, feedback_dat
                 total_samples += labels.size(0)
                 correct_labels += (predicted_labels == labels).sum().item()
 
-                # For F1-score calculation
                 all_true_labels.extend(labels.cpu().numpy().tolist())
                 all_pred_labels.extend(predicted_labels.cpu().numpy().tolist())
 
-                # Concept accuracy
                 predicted_concepts = (pred_concepts > 0.5).float()
                 concept_matches = (predicted_concepts == concepts).float()
                 correct_concepts += concept_matches.sum().item()
@@ -744,7 +785,7 @@ def finetune_cbm_with_llava_feedback(output_dir, logger, cbm_model, feedback_dat
     torch.save(final_checkpoint, final_model_path)
     logger.info(f"Final fine-tuned model saved to: {final_model_path}")
 
-    # Training summary
+    # Summary
     best_epoch_idx = np.argmax(f1_scores) if f1_scores else 0
     print(f"\n FINE-TUNING SUMMARY:")
     print(f"   Completed epochs: {len(train_losses)}")
@@ -776,12 +817,13 @@ def evaluate_finetuned_model(cbm_model, test_loader, output_dir, device: str = '
     
     Args:
         cbm_model: Fine-tuned CBM model
-        test_loader: Test data loader
+        test_loader: DataLoader for the test set
+        output_dir: Directory to save evaluation results
         device: Device for evaluation
-        logger: Logger instance
-        
+        logger: Optional logger for logging information
+
     Returns:
-        Evaluation metrics dictionary
+        Dictionary with evaluation metrics
     """
     cbm_model.to(device)
     cbm_model.eval()
@@ -800,7 +842,6 @@ def evaluate_finetuned_model(cbm_model, test_loader, output_dir, device: str = '
             pred_concepts, pred_labels = cbm_model(images)
             pred_concepts, pred_labels = cbm_model(images)
             
-            # Label accuracy
             _, predicted = torch.max(pred_labels.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
@@ -808,7 +849,6 @@ def evaluate_finetuned_model(cbm_model, test_loader, output_dir, device: str = '
             all_predictions.extend(predicted.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
             
-            # Concept accuracy
             pred_concepts_binary = (torch.sigmoid(pred_concepts) > 0.5).float()
             concept_correct += (pred_concepts_binary == concepts).sum().item()
             concept_total += concepts.numel()
@@ -816,7 +856,6 @@ def evaluate_finetuned_model(cbm_model, test_loader, output_dir, device: str = '
     # Calculate metrics
     accuracy = correct / total
     
-    # Calculate per-class metrics if binary classification
     report = classification_report(all_labels, all_predictions, output_dict=True)
     cm = confusion_matrix(all_labels, all_predictions)
     
