@@ -18,6 +18,7 @@ class LLaVAFeedbackDataset(Dataset):
         Args:
             feedback_data (List[Dict]): List of feedback annotations
             transform: Image transformations
+            logger: Logger instance
             min_confidence (float): Minimum confidence threshold for corrections
         """
         self.feedback_data = feedback_data
@@ -106,8 +107,6 @@ class LLaVAFeedbackDataset(Dataset):
                  
             if agreeing_strategies < strategy_agreement_threshold:
                 continue
-                
-            # correction_direction = f"{cbm_pred} -> {llava_final}"
             
             validated_corrections.append(sample)
         
@@ -201,7 +200,15 @@ class LLaVAFeedbackDataset(Dataset):
 
 class EnhancedLLaVAAnnotator:
     def __init__(self, model_id="llava-hf/llava-v1.6-mistral-7b-hf", device="cuda", logger=None, quantization = None):
-        """Enhanced LLaVA annotator with multiple evaluation strategies"""
+        """
+        Enhanced LLaVA annotator with multiple evaluation strategies
+
+        Args:
+            model_id (str): Model identifier
+            device (str): Device to run the model on
+            logger (logging.Logger, optional): Logger instance
+            quantization (BitsAndBytesConfig, optional): Quantization configuration
+        """
         self.device = device
         self.model_id = model_id
         self.logger = logger
@@ -234,6 +241,17 @@ class EnhancedLLaVAAnnotator:
                                dataset_type: str, ground_label: int) -> Dict:
         """
         Use multiple prompting strategies to get comprehensive feedback
+
+        Args:
+            image (Image.Image): Input image
+            prediction (int): Model prediction
+            concept_probs (np.ndarray): Concept probabilities
+            concept_names (List[str]): List of concept names
+            dataset_type (str): Type of dataset (e.g., "shapes3d", "cub")
+            ground_label (int): Ground truth label
+
+        Returns:
+            Dict: Dictionary containing feedback from different strategies
         """
         results = {}
         
@@ -243,6 +261,7 @@ class EnhancedLLaVAAnnotator:
         # Strategy 2: Guided completion
         results['guided'] = self._guided_classification_prompt(image, dataset_type)
 
+        # Strategy 3: Complete prompt
         results['complete'] = self._complete_classification_prompt(image, dataset_type)
 
         # Aggregate results
@@ -462,9 +481,6 @@ Be concise.
     def uncertainty_based_sampling(self, collected_data: Dict, 
                                   uncertainty_threshold: float = 0.3,
                                   max_samples: int = 500) -> List[str]:
-        """
-        Sample images where CBM is most uncertain for LLaVA evaluation
-        """
         uncertain_samples = []
         
         for sample_id, sample in collected_data.items():
