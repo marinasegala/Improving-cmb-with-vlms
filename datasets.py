@@ -286,86 +286,6 @@ class SHAPES3DMini(Subset):
 # CUB-200-2011 DATASET OVERVIEW
 # ================================
 
-"""
-CUB-200-2011 Dataset Structure:
-
-DATASET STATISTICS:
-- 11,788 images total (5,994 training, 5,794 testing)
-- 200 bird species/classes (fine-grained classification)
-- 312 binary attributes (concepts) per image
-- 15 part locations per image
-- 1 bounding box per image
-
-BIRD CLASSES (200 species):
-Examples include: Albatross, Blackbird, Blue Jay, Cardinal, Duck, Eagle, 
-Falcon, Goldfinch, Hawk, Hummingbird, Kingfisher, Mallard, Oriole, 
-Owl, Parrot, Pelican, Robin, Sparrow, Swan, Woodpecker, etc.
-
-312 BINARY ATTRIBUTES (CONCEPTS) ORGANIZED BY:
-
-1. BILL (Beak) attributes (~30 concepts):
-   - bill_length (short, medium, long)
-   - bill_color (black, white, red, yellow, orange, brown, grey)
-   - bill_shape (hooked, pointed, curved, flat, etc.)
-   - bill_texture (smooth, rough)
-
-2. WING attributes (~40 concepts):
-   - wing_color (various colors)
-   - wing_pattern (solid, spotted, striped, etc.)
-   - wing_shape (broad, narrow, pointed, rounded)
-   - wing_length (short, medium, long)
-
-3. UPPERPARTS attributes (~50 concepts):
-   - upperparts_color (black, white, red, blue, etc.)
-   - upperparts_pattern (solid, spotted, striped, mottled)
-
-4. UNDERPARTS attributes (~40 concepts):
-   - underparts_color (various colors)
-   - underparts_pattern (solid, spotted, striped)
-
-5. BREAST attributes (~20 concepts):
-   - breast_color (various colors)
-   - breast_pattern (solid, spotted, striped)
-
-6. BACK attributes (~20 concepts):
-   - back_color (various colors)
-   - back_pattern (solid, spotted, striped)
-
-7. TAIL attributes (~30 concepts):
-   - tail_color (various colors)
-   - tail_pattern (solid, spotted, striped)
-   - tail_shape (forked, squared, rounded, pointed)
-   - tail_length (short, medium, long)
-
-8. HEAD attributes (~40 concepts):
-   - head_color (various colors)
-   - head_pattern (solid, spotted, striped, capped)
-
-9. THROAT attributes (~15 concepts):
-   - throat_color (various colors)
-
-10. EYE attributes (~10 concepts):
-    - eye_color (black, red, yellow, white, etc.)
-
-11. LEG attributes (~15 concepts):
-    - leg_color (black, white, red, yellow, orange, brown, grey)
-
-12. SIZE attributes (~2 concepts):
-    - size (small_5-9_inches, medium_9-16_inches, large_16-32_inches, very_large_32-72_inches)
-
-ANNOTATION QUALITY:
-- All annotations filtered by multiple Amazon Mechanical Turk workers
-- High-quality, detailed attribute annotations
-- Consistent across all images
-- Suitable for fine-grained recognition tasks
-
-USAGE FOR CONCEPT-BOTTLENECK MODELS:
-- 312 concepts provide rich intermediate representation
-- Concepts are interpretable (bird parts and appearance)
-- Good for studying concept-based explanations
-- Can analyze which concepts are most important for each species
-"""
-
 CUB_CONCEPT_NAMES = [
     'forehead_black', 'crown_black', 'nape_black', 'throat_black', 
     'breast_black', 'back_black', 'upperparts_black', 'belly_black', 
@@ -381,6 +301,8 @@ class CUBDataset(Dataset):
             data_dir (str): Path to CUB dataset directory
             transform: Image transformations
             split (str): 'train', 'val', 'test'
+            val_ratio (float): Fraction of training data to use for validation
+            random_seed (int): Random seed for reproducibility
         """
         self.data_dir = data_dir
         self.transform = transform
