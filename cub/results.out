@@ -1,0 +1,135 @@
+Using device: cuda
+Loaded 312 attribute names from CUB_200_2011/attributes/attributes.txt
+Loaded 11788 entries from CUB_200_2011/images.txt
+Loaded 11788 entries from CUB_200_2011/image_class_labels.txt
+Loaded 11788 entries from CUB_200_2011/train_test_split.txt
+Created splits from 5994 training samples:
+  New train: 4796 samples
+  New val: 1198 samples
+Processing CUB dataset for 'Black Bird vs Not Black Bird' classification...
+
+Dataset processed (train):
+  Total samples: 4796
+  Black birds: 2469 (51.5%)
+  Not black birds: 2327 (48.5%)
+  Using 12 black-related concepts out of 312 total
+  Black concepts: ['wing_black', 'upperparts_black', 'back_black', 'upper_tail_black', 'breast_black', 'throat_black', 'forehead_black', 'under_tail_black', 'nape_black', 'belly_black', 'primary_black', 'crown_black']
+Loaded 312 attribute names from CUB_200_2011/attributes/attributes.txt
+Loaded 11788 entries from CUB_200_2011/images.txt
+Loaded 11788 entries from CUB_200_2011/image_class_labels.txt
+Loaded 11788 entries from CUB_200_2011/train_test_split.txt
+Created splits from 5994 training samples:
+  New train: 4796 samples
+  New val: 1198 samples
+Processing CUB dataset for 'Black Bird vs Not Black Bird' classification...
+
+Dataset processed (val):
+  Total samples: 1198
+  Black birds: 616 (51.4%)
+  Not black birds: 582 (48.6%)
+  Using 12 black-related concepts out of 312 total
+  Black concepts: ['wing_black', 'upperparts_black', 'back_black', 'upper_tail_black', 'breast_black', 'throat_black', 'forehead_black', 'under_tail_black', 'nape_black', 'belly_black', 'primary_black', 'crown_black']
+Loaded 312 attribute names from CUB_200_2011/attributes/attributes.txt
+Loaded 11788 entries from CUB_200_2011/images.txt
+Loaded 11788 entries from CUB_200_2011/image_class_labels.txt
+Loaded 11788 entries from CUB_200_2011/train_test_split.txt
+Created splits from 5994 training samples:
+  New train: 4796 samples
+  New val: 1198 samples
+Processing CUB dataset for 'Black Bird vs Not Black Bird' classification...
+
+Dataset processed (test):
+  Total samples: 5794
+  Black birds: 2944 (50.8%)
+  Not black birds: 2850 (49.2%)
+  Using 12 black-related concepts out of 312 total
+  Black concepts: ['wing_black', 'upperparts_black', 'back_black', 'upper_tail_black', 'breast_black', 'throat_black', 'forehead_black', 'under_tail_black', 'nape_black', 'belly_black', 'primary_black', 'crown_black']
+Val F1-macro: 0.440 | F1-pos: 0.677
+Val F1-macro: 0.533 | F1-pos: 0.678
+Val F1-macro: 0.566 | F1-pos: 0.501
+Val F1-macro: 0.340 | F1-pos: 0.679
+Val F1-macro: 0.374 | F1-pos: 0.682
+Val F1-macro: 0.574 | F1-pos: 0.512
+Val F1-macro: 0.482 | F1-pos: 0.663
+Val F1-macro: 0.516 | F1-pos: 0.655
+Val F1-macro: 0.613 | F1-pos: 0.546
+Val F1-macro: 0.387 | F1-pos: 0.112
+Val F1-macro: 0.624 | F1-pos: 0.562
+Val F1-macro: 0.644 | F1-pos: 0.660
+Val F1-macro: 0.635 | F1-pos: 0.562
+Val F1-macro: 0.670 | F1-pos: 0.654
+Val F1-macro: 0.591 | F1-pos: 0.488
+Val F1-macro: 0.583 | F1-pos: 0.465
+Val F1-macro: 0.651 | F1-pos: 0.619
+Val F1-macro: 0.677 | F1-pos: 0.663
+Val F1-macro: 0.662 | F1-pos: 0.672
+Val F1-macro: 0.667 | F1-pos: 0.637
+Early stopping triggered at epoch 19
+
+ Early stopping at epoch 19
+   Best epoch: 4
+   Best val F1-pos: 0.6823
+   Best val accuracy: 52.59%
+Final model saved as 'final_model.pth'
+
+ TRAINING SUMMARY:
+   Completed epochs: 20
+   Best epoch: 4
+   Best val loss: 1.2610
+   Best val accuracy: 52.59%
+   Best concept accuracy: 71.97%
+   Best f1: 0.68%
+Training complete! Best model saved as 'best_model.pth'
+cub model setup complete!
+
+=== ENHANCED LLAVA FEEDBACK STATISTICS (CUB) ===
+Total samples evaluated: 500
+Corrections suggested: 225 (45.0%)
+High-confidence corrections: 225 (45.0%)
+
+Strategy Agreement with CBM:
+  direct: 28.0% agreement (140/500)
+  guided: 25.8% agreement (129/500)
+  complete: 16.6% agreement (83/500)
+
+LLaVA Confidence Distribution:
+  Mean: 0.870
+  Std: 0.100
+  High confidence (>0.5): 500 samples
+  Low confidence (<0.4): 0 samples
+
+Evaluating on test set BEFORE finetuning...
+=== Test Evaluation Results ===
+Test Accuracy: 0.5176
+Total Samples: 5794
+-------------
+Test F1-macro: 0.3708
+Test F1-weighted: 0.3757
+Test F1 - class 1: 0.6747
+Test F1 - class 0: 0.0668
+Confusion Matrix:
+[[ 100 2750]
+ [  45 2899]]
+
+ FINE-TUNING SUMMARY:
+   Completed epochs: 30
+   Best epoch: 15
+   Best val loss: 1.1460
+   Best val accuracy: 66.11%
+   Best concept accuracy: 73.87%
+   Best F1: 0.6004
+   Corrections applied: 225
+
+Evaluating on test set AFTER finetuning...
+=== Test Evaluation Results ===
+Test Accuracy: 0.6417
+Total Samples: 5794
+-------------
+Test F1-macro: 0.6274
+Test F1-weighted: 0.6262
+Test F1 - class 1: 0.5545
+Test F1 - class 0: 0.7003
+Confusion Matrix:
+[[2426  424]
+ [1652 1292]]
+Finish
